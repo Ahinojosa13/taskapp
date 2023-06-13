@@ -1,60 +1,61 @@
-// window.addEventListener('load', () => {
-//     const form = document.querySelector("#new-task");
-//     const input = document.querySelector("newtask-input");
-//     const list_el = document.querySelector("#tasks");
+// Create document to pull items from html by ID
+const taskForm = document.getElementById('taskForm');
+const titleTaskInput = document.getElementById('title');
+const descriptionTaskInput = document.getElementById('description');
+const list = document.getElementById('list');
+// Empty Array for Task to be stored and push later
+let ulTask = [];
 
-//     form.addEventListener('submit', (e)=>{
-//         e.preventDefault();
-//         const task = input.value;
-//         if(!task){
-//             alert("Please fill out the task");
-//             return;
-//         }
-//         const task_el = document.createElement("div");
-//         task_el.classList.add("task");
-        
-//         const task_content_el = document.createElement("div");
-//         task_content_el.classList.add("content");
-
-//         task_el.appendChild(task_content_el);
-
-//         const task_input_el = document.createElement("input");
-//         task_input_el.classList.add("text");
-//         task_input_el.type = "text";
-//         task_input_el.value = task;
-//         task_input_el.setAttribute("readonly", "readonly");
-
-//         task_content_el.appendChild(task_input_el);
-
-//         const task_actions_el = document.createElement("div");
-//         task_actions_el.classList.add("actions");
-
-//         const task_edit_el = document.createElement("button");
-//         task_edit_el.classList.add("edit");
-//         task_edit_el.innerHTML = "Edit";
-
-//         const task_delete_el = document.createElement("button");
-//         task_delete_el.classList.add("delete");
-//         task_delete_el.innerHTML = "Delete";
-
-//         task_el.appendChild(task_actions_el);
-
-//         task_el.appendChild(task_el);
-
-//         input.value = "";
-
-//         task_edit_el.addEventListener('click', () => {
-//            if(task_edit_el.innerText.toLowerCase() == "edit"){
-//              task_input_el.removeAttribute("readonly");
-//              task_input_el.focus();
-//              task_edit_el.innerText = "Save";
-//            } else{
-//             task_input_el.setAttribute("readonly","readonly");
-//             task_edit_el.innerText = "Edit";
-//            }
-//         });
-//         task_delete_el.addEventListener('click', () => {
-//             list_el.removeChild(task_el);
-//         });
-//     });
-// });
+// Create Task
+function updateTask(){
+    list.innerHTML = '';
+    ulTask.forEach((task, index)=>{
+        const listItem = document.createElement('li');
+        listItem.innerHTML = `
+            <span>${task.title}</span>
+            <span>${task.description}</span>
+            <button class="edit-btn" data-index="${index}">Edit</button>
+            <button class="delete-btn" data-index="${index}">Delete</button>`;
+        list.appendChild(listItem);
+    });
+    // Edit and Delete Eventlistener
+    const editButtons = document.querySelectorAll('.edit-btn');
+    editButtons.forEach(button =>{
+        button.addEventListener('click', editTask);
+    });
+    const deleteButtons = document.querySelectorAll('.delete-btn');
+    deleteButtons.forEach(button =>{
+        button.addEventListener('click', deleteTask);
+    });
+}
+// Form Submit Function
+function formSumbit(event){
+    event.preventDefault();
+    const title = titleTaskInput.value;
+    const description = descriptionTaskInput.value;
+    const updateTask = {
+        title, 
+        description
+    };
+    ulTask.push(updateTask);
+    titleTaskInput.value = '';
+    descriptionTaskInput.value = '';
+    updateTask();
+}
+// Edit JS
+function editTask(event){
+    const index = event.target.getAttribute('data-index');
+    const newTitle = prompt('Edit Title:');
+    const newDescription = prompt('Edit Description:');
+    // Update New Edits to arrive
+    ulTask[index].title = newTitle;
+    ulTask[index].description = newDescription;
+    updateTask();
+}
+// Delete JS
+function deleteTask(event){
+    const index = event.target.getAttribute('data-index');
+    ulTask.slice(index, 1);
+    updateTask();
+}
+taskForm.addEventListener('submit', formSumbit);
